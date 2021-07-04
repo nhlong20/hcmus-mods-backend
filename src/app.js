@@ -24,6 +24,14 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 //   ---------------------------------------------------------------
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/error-controller');
+app.get('/', async (req,res) => {
+    res.status(200).json({
+        status: 'success',
+        data: "Chào mừng tới khóa học trực tuyến"
+    })
+})
 // app.use('/user', userRouter);
 // app.use('/feedback', feedbackRouter);
 
@@ -32,7 +40,7 @@ app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// // error handler
-// app.use(globalErrorHandler);
+// error handler
+app.use(globalErrorHandler);
 
 module.exports = app;
