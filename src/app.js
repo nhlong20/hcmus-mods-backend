@@ -1,6 +1,5 @@
 const path = require('path');
 const express = require('express');
-// const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
 
@@ -26,13 +25,17 @@ if (process.env.NODE_ENV === 'development') {
 //   ---------------------------------------------------------------
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error-controller');
-app.get('/', async (req,res) => {
+const userRouter = require('./routes/user-route');
+const courseRouter = require('./routes/course-route');
+
+app.get('/api', async (req,res) => {
     res.status(200).json({
         status: 'success',
         data: "Chào mừng tới khóa học trực tuyến"
     })
 })
-// app.use('/user', userRouter);
+app.use('/api/user', userRouter)
+app.use('/api/course', courseRouter)
 // app.use('/feedback', feedbackRouter);
 
 //REDIRECT WRONG URL.

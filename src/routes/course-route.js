@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-// const userCtrl = require('../controllers/user-controller');
+const courseCtrl = require('../controllers/course-controller');
 
 // const authServ = require('../services/auth-service');
 
-// router.post('/', userCtrl.createUser);
+router.post('/', courseCtrl.createOne);
+router.get('/:course_id', courseCtrl.getOne);
 // router.post('/login', userCtrl.loginUser);
 // router.get('/search', userCtrl.getAllUsers);
  
