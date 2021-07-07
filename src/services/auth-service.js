@@ -8,14 +8,16 @@ const accessTokenSecret =
 
 let isAuth = catchAsync(async (req, res, next) => {
     // Getting token and check token's existance
-    const tokenFromClient =
-        req.body.token || req.query.token || req.headers['bearer-token'];
-    if (!tokenFromClient) {
+    const bearerHeader = req.headers['authorization'];
+    if (!bearerHeader) {
         return next(new AppError('You are not logged in!', 401));
     }
+    const bearer = bearerHeader.split(' ');
+    const accessTokenFromClient = bearer[1];
+
     // 2 - Verification token
     const decoded = await jwtHelper.verifyToken(
-        tokenFromClient,
+        accessTokenFromClient,
         accessTokenSecret
     );
     // 3 - Check if user still exists
