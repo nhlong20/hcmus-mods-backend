@@ -29,9 +29,9 @@ CREATE TABLE Accounts (
 CREATE TABLE Teachers (
   teacher_id SERIAL NOT NULL, 
   account_id integer NOT NULL,
-  fullname varchar(50) NOT NULL,
+  fullname varchar(50),
   gender varchar(3) CHECK (gender in ('Nam', 'Nữ')),
-  dob date NOT NULL CHECK (dob > '1900-01-01'),
+  dob date CHECK (dob > '1900-01-01'),
   phone varchar(20),
   addr varchar(100)
   );
@@ -39,9 +39,9 @@ CREATE TABLE Teachers (
 CREATE TABLE Moderators (
   moderator_id SERIAL NOT NULL, 
   account_id   integer NOT NULL,
-  fullname     varchar(50) NOT NULL,
+  fullname     varchar(50),
   gender       varchar(3) CHECK (gender in ('Nam', 'Nữ')),
-  dob          date NOT NULL CHECK (dob > '1900-01-01'),
+  dob          date CHECK (dob > '1900-01-01'),
   phone        varchar(20),
   addr         varchar(100)
   );
@@ -49,9 +49,9 @@ CREATE TABLE Moderators (
 CREATE TABLE Admin (
   admin_id   SERIAL NOT NULL, 
   account_id integer NOT NULL,
-  fullname   varchar(50) NOT NULL,
+  fullname   varchar(50),
   gender     varchar(3) CHECK (gender in ('Nam', 'Nữ')),
-  dob        date NOT NULL CHECK (dob > '1900-01-01'),
+  dob        date CHECK (dob > '1900-01-01'),
   phone      varchar(20),
   addr       varchar(100)
   );
@@ -104,9 +104,9 @@ CREATE TABLE Semesters (
 CREATE TABLE Students (
   student_id VARCHAR(20) NOT NULL,
   account_id integer NOT NULL,
-  fullname   varchar(50) NOT NULL,
+  fullname   varchar(50),
   gender     varchar(3) CHECK (gender in ('Nam', 'Nữ')),
-  dob        date NOT NULL CHECK (dob > '1900-01-01'),
+  dob        date CHECK (dob > '1900-01-01'),
   phone      varchar(20),
   addr       varchar(100)
   );

@@ -32,14 +32,21 @@ exports.createUser = catchAsync(async (req, res, next) => {
     // hash password
     const { username, password, acc_type } = req.body;
     const hashedPassword = userService.encryptPassword(password);
-    const text = `INSERT INTO Accounts (acc_type, username, passwd) VALUES ($1,$2,$3) RETURNING *`;
+    let queryString = `INSERT INTO Accounts (acc_type, username, passwd) VALUES ($1,$2,$3) RETURNING *`;
+    const users = await pool.query(queryString, [acc_type, username, hashedPassword]);
 
-    const users = await pool.query(text, [acc_type, username, hashedPassword]);
+    const user = users.rows[0]
+    let accType = acc_type.toLowerCase()
+    queryString = `INSERT INTO ${accType}s (${accType}_id, account_id) VALUES ($1,$2) RETURNING *`;
+    const userInfos = await pool.query(queryString, [user.username, user.account_id]);
 
     res.status(201).json({
         status: 'success',
         data: {
-            users: users.rows[0]
+            new_user: {
+              ...user,
+              ...userInfos.rows[0]
+            }
         }
     });
 });
@@ -59,6 +66,15 @@ exports.loginUser = catchAsync(async (req, res, next) => {
     );
     if (!result) return next(new AppError('Password is incorrect', 404));
     let user = users.rows[0];
+    // populate data
+    accType = user.acc_type + "s";
+    queryString = `SELECT * FROM ${accType} WHERE account_id = $1`;
+
+    const userInfo = await pool.query(queryString, [user.account_id]);
+
+    console.log(userInfo.rows[0])
+    user = { ...user, ...userInfo.rows[0]}
+
     let dataPayload = {
         account_id: user.account_id,
         user_name: user.username
