@@ -9,7 +9,7 @@ let generateToken = async (userData, privateKey, tokenLife, admin = false) => {
   try {
     let payload = { user: userData, admin: admin };
     let signOptions = {
-      issuer: "CSI Community",
+      issuer: "Hcmus Mods",
       algorithm: "HS256",
       expiresIn: tokenLife
     }
