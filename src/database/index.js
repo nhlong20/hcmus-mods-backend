@@ -1,6 +1,6 @@
 const Pool = require('pg').Pool
 
-const pool = new Pool({
+const localPoolConfig = new Pool({
   user: 'postgres',
   password: 'hoanglong',
   host: 'localhost',
@@ -8,4 +8,8 @@ const pool = new Pool({
   database: 'hcmus_mods'
 })
 
+const pool = process.env.DATABASE_URL ? {
+  connectionString: process.env.DATABASE_URL,
+  ssl: {rejectUnauthorized: false }
+} : localPoolConfig
 module.exports = pool

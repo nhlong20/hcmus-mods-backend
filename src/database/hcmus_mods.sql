@@ -22,6 +22,7 @@ CREATE TABLE Accounts (
   acc_type varchar(10) NOT NULL,
   username varchar(30) UNIQUE NOT NULL,
   passwd varchar(100) NOT NULL,
+  refresh_token text,
   created_at timestamp without time zone default CURRENT_TIMESTAMP NOT NULL
   );
 

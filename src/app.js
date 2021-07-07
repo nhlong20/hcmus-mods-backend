@@ -34,7 +34,7 @@ app.get('/api', async (req,res) => {
         data: "Chào mừng tới khóa học trực tuyến"
     })
 })
-app.use('/api/user', userRouter)
+app.use('/api/users', userRouter)
 app.use('/api/course', courseRouter)
 // app.use('/feedback', feedbackRouter);
 
