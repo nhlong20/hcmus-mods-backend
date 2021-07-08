@@ -26,6 +26,7 @@ if (process.env.NODE_ENV === 'development') {
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error-controller');
 const userRouter = require('./routes/user-route');
+const authRouter = require('./routes/auth-route');
 const courseRouter = require('./routes/course-route');
 
 app.get('/api', async (req,res) => {
@@ -34,8 +35,10 @@ app.get('/api', async (req,res) => {
         data: "Chào mừng tới khóa học trực tuyến"
     })
 })
+// app.use('/api/auth', authRouter)
 app.use('/api/users', userRouter)
 app.use('/api/course', courseRouter)
+
 // app.use('/feedback', feedbackRouter);
 
 //REDIRECT WRONG URL.

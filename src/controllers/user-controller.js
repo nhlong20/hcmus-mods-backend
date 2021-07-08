@@ -13,6 +13,31 @@ const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE || '3650d';
 const refreshTokenSecret =
     process.env.REFRESH_TOKEN_SECRET || 'refresh-token-secret-example';
 
+exports.aliasTopUsers = (req, res, next) => {
+    req.query.limit = '10';
+    req.query.fields = 'username, fullname';
+    next();
+};
+
+exports.getUsers = catchAsync(async (req, res, next) => {
+    filter = {};
+    if (req.query.limit) filter = { ...filter, limit: req.query.limit };
+    if (req.query.acc_type) filter = { ...filter, accType: req.query.acc_type.toLowerCase() };
+
+    const queryString = `SELECT * FROM accounts acc
+                        ${filter.accType ? "WHERE acc.acc_type = '" + filter.accType +"'": ''}
+                        ORDER BY acc.username ASC
+                        ${filter.limit ? 'LIMIT ' + filter.limit : ''}`;
+    const users = await pool.query(queryString);
+
+    res.status(201).json({
+        status: 'success',
+        data: {
+            users: users.rows
+        }
+    });
+});
+
 exports.getUser = catchAsync(async (req, res, next) => {
     const { user_id } = req.params;
     const text = `SELECT * FROM accounts acc WHERE acc.account_id = $1`;
@@ -33,19 +58,26 @@ exports.createUser = catchAsync(async (req, res, next) => {
     const { username, password, acc_type } = req.body;
     const hashedPassword = userService.encryptPassword(password);
     let queryString = `INSERT INTO Accounts (acc_type, username, passwd) VALUES ($1,$2,$3) RETURNING *`;
-    const users = await pool.query(queryString, [acc_type, username, hashedPassword]);
+    const users = await pool.query(queryString, [
+        acc_type.toLowerCase(),
+        username,
+        hashedPassword
+    ]);
 
-    const user = users.rows[0]
-    let accType = acc_type.toLowerCase()
+    const user = users.rows[0];
+    let accType = acc_type.toLowerCase();
     queryString = `INSERT INTO ${accType}s (${accType}_id, account_id) VALUES ($1,$2) RETURNING *`;
-    const userInfos = await pool.query(queryString, [user.username, user.account_id]);
+    const userInfos = await pool.query(queryString, [
+        user.username,
+        user.account_id
+    ]);
 
     res.status(201).json({
         status: 'success',
         data: {
             new_user: {
-              ...user,
-              ...userInfos.rows[0]
+                ...user,
+                ...userInfos.rows[0]
             }
         }
     });
@@ -67,13 +99,13 @@ exports.loginUser = catchAsync(async (req, res, next) => {
     if (!result) return next(new AppError('Password is incorrect', 404));
     let user = users.rows[0];
     // populate data
-    accType = user.acc_type + "s";
+    accType = user.acc_type.toLowerCase() + 's';
     queryString = `SELECT * FROM ${accType} WHERE account_id = $1`;
 
     const userInfo = await pool.query(queryString, [user.account_id]);
 
-    console.log(userInfo.rows[0])
-    user = { ...user, ...userInfo.rows[0]}
+    console.log(userInfo.rows[0]);
+    user = { ...user, ...userInfo.rows[0] };
 
     let dataPayload = {
         account_id: user.account_id,
@@ -101,6 +133,36 @@ exports.loginUser = catchAsync(async (req, res, next) => {
         data: {
             token,
             refreshToken,
+            user
+        }
+    });
+});
+
+exports.updateUser = catchAsync(async (req, res, next) => {
+    const { user_id } = req.params;
+    const text = `SELECT * FROM accounts acc WHERE acc.account_id = $1`;
+
+    const users = await pool.query(text, [user_id]);
+    const user = users.rows[0];
+
+    res.status(201).json({
+        status: 'success',
+        data: {
+            user
+        }
+    });
+});
+
+exports.deleteUser = catchAsync(async (req, res, next) => {
+    const { user_id } = req.params;
+    const text = `SELECT * FROM accounts acc WHERE acc.account_id = $1`;
+
+    const users = await pool.query(text, [user_id]);
+    const user = users.rows[0];
+
+    res.status(201).json({
+        status: 'success',
+        data: {
             user
         }
     });

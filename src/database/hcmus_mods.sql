@@ -231,10 +231,10 @@ ALTER TABLE Appendix ADD CONSTRAINT FKAppendix764589 FOREIGN KEY (module_id) REF
 ALTER TABLE Reviews ADD CONSTRAINT FKReviews562743 FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
 
 
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'Student', '18120449', '18120449', default);
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'Student', '18120460', '18120460', default);
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'Student', '18120461', '18120461', default);
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'Teacher', 'GV001', 'GV001', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120449', '18120449', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120460', '18120460', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120461', '18120461', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'teacher', 'GV001', 'GV001', default);
 
 INSERT INTO Subjects (subject_id, name, credits) VALUES ('OOP', 'Lập trình hướng đối tượng', 4);
 INSERT INTO Subjects (subject_id, name, credits) VALUES ('CTDLGT', 'Cấu trúc dữ liệu và giải thuật', 4);
