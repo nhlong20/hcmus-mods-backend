@@ -22,10 +22,14 @@ exports.aliasTopUsers = (req, res, next) => {
 exports.getUsers = catchAsync(async (req, res, next) => {
     filter = {};
     if (req.query.limit) filter = { ...filter, limit: req.query.limit };
-    if (req.query.acc_type) filter = { ...filter, accType: req.query.acc_type.toLowerCase() };
+    const { acc_type } = req.body
+    if(!acc_type){
+        return next(new AppError('You must include acc_type to json request', 400));
+    }
 
     const queryString = `SELECT * FROM accounts acc
-                        ${filter.accType ? "WHERE acc.acc_type = '" + filter.accType +"'": ''}
+                        NATURAL JOIN ${acc_type}s s
+                        WHERE acc.account_id = s.account_id 
                         ORDER BY acc.username ASC
                         ${filter.limit ? 'LIMIT ' + filter.limit : ''}`;
     const users = await pool.query(queryString);
@@ -40,12 +44,23 @@ exports.getUsers = catchAsync(async (req, res, next) => {
 
 exports.getUser = catchAsync(async (req, res, next) => {
     const { user_id } = req.params;
-    const text = `SELECT * FROM accounts acc WHERE acc.account_id = $1`;
+    const { acc_type } = req.body
+    if(!acc_type){
+        return next(new AppError('You must include acc_type to json request', 400));
+    }
+    
+    const queryString = `SELECT * 
+    FROM accounts acc 
+     NATURAL JOIN ${acc_type}s s 
+     WHERE acc.account_id = s.account_id AND acc.account_id = $1`;
+    const users = await pool.query(queryString, [user_id]);
 
-    const users = await pool.query(text, [user_id]);
-    const user = users.rows[0];
+    if(users.rows.length === 0){
+        return next(new AppError('No user found with that username', 404));
+    }
+    let user = users.rows[0];
 
-    res.status(201).json({
+    res.status(200).json({
         status: 'success',
         data: {
             user
@@ -104,7 +119,6 @@ exports.loginUser = catchAsync(async (req, res, next) => {
 
     const userInfo = await pool.query(queryString, [user.account_id]);
 
-    console.log(userInfo.rows[0]);
     user = { ...user, ...userInfo.rows[0] };
 
     let dataPayload = {
@@ -139,7 +153,24 @@ exports.loginUser = catchAsync(async (req, res, next) => {
 });
 
 exports.updateUser = catchAsync(async (req, res, next) => {
-  
+    const { user_id } = req.params;
+    const {acc_type, fullname, gender, dob, phone, addr} = req.body
+    const queryString = `UPDATE ${acc_type}s 
+                            SET fullname = $1,
+                                gender = $2,
+                                dob = $3,
+                                phone = $4,
+                                addr = $5
+                            WHERE account_id = $6 RETURNING *`;
+
+    const updatedUser = await pool.query(queryString, [fullname, gender, dob, phone, addr, user_id]);
+    let user = updatedUser.rows[0]
+    res.status(201).json({
+        status: 'success',
+        data: {
+            user
+        }
+    });
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {

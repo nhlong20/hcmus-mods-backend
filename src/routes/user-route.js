@@ -12,8 +12,8 @@ router.get('/', userCtrl.getUsers);
  
 router.use(authServ.isAuth); // req.payload
 
-router.route('/')
-    .put(userCtrl.updateUser)
+router.route('/:user_id')
+    .patch(userCtrl.updateUser)
     .delete(userCtrl.deleteUser);
 router.route('/:user_id')
     .get(userCtrl.getUser)
