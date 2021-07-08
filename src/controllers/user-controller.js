@@ -1,9 +1,10 @@
+'use strict';
 const userService = require('../services/user-service');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const jwthelper = require('../utils/jsonwebtoken');
 const pool = require('../database');
-const bcrypt = require('bcryptjs');
+const userServ = require('../services/user-service');
 
 const accessTokenLife = process.env.ACCESS_TOKEN_LIFE || '1h';
 const accessTokenSecret =
@@ -13,33 +14,26 @@ const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE || '3650d';
 const refreshTokenSecret =
     process.env.REFRESH_TOKEN_SECRET || 'refresh-token-secret-example';
 
-exports.aliasTopUsers = (req, res, next) => {
-    req.query.limit = '10';
-    req.query.fields = 'username, fullname';
-    next();
-};
-
 exports.getUsers = catchAsync(async (req, res, next) => {
-    filter = {};
+    let filter = {};
     if (req.query.limit) filter = { ...filter, limit: req.query.limit };
+    if (req.query.offset) filter = { ...filter, offset: req.query.offset };
     const { acc_type } = req.body;
     if (!acc_type) {
         return next(
             new AppError('You must include acc_type to json request', 400)
         );
     }
+    const records = await userServ.getAll(filter, acc_type);
 
-    const queryString = `SELECT * FROM accounts acc
-                        NATURAL JOIN ${acc_type}s s
-                        WHERE acc.account_id = s.account_id 
-                        ORDER BY acc.username ASC
-                        ${filter.limit ? 'LIMIT ' + filter.limit : ''}`;
-    const users = await pool.query(queryString);
+    if (!records || records.length === 0) {
+        return next(new AppError('No record found', 404));
+    }
 
-    res.status(201).json({
+    res.status(200).json({
         status: 'success',
         data: {
-            users: users.rows
+            users: records
         }
     });
 });
@@ -52,51 +46,49 @@ exports.getUser = catchAsync(async (req, res, next) => {
             new AppError('You must include acc_type to json request', 400)
         );
     }
-
-    const queryString = `SELECT * 
-    FROM accounts acc 
-     NATURAL JOIN ${acc_type}s s 
-     WHERE acc.account_id = s.account_id AND acc.account_id = $1`;
-    const users = await pool.query(queryString, [user_id]);
-
-    if (users.rows.length === 0) {
-        return next(new AppError('No user found with that username', 404));
+    const record = await userServ.getOne({ user_id, acc_type });
+    if (!record || record.length === 0) {
+        return next(new AppError('No record found with that id', 404));
     }
-    let user = users.rows[0];
-
     res.status(200).json({
         status: 'success',
         data: {
-            user
+            user: record
         }
     });
 });
 
 exports.createUser = catchAsync(async (req, res, next) => {
     // hash password
-    const { username, password, acc_type } = req.body;
-    const hashedPassword = userService.encryptPassword(password);
-    let queryString = `INSERT INTO Accounts (acc_type, username, passwd) VALUES ($1,$2,$3) RETURNING *`;
-    const users = await pool.query(queryString, [
-        acc_type.toLowerCase(),
-        username,
-        hashedPassword
-    ]);
+    const { username, password, acc_type, fullname, gender, dob, phone, addr } =
+        req.body;
 
-    const user = users.rows[0];
-    let accType = acc_type.toLowerCase();
-    queryString = `INSERT INTO ${accType}s (${accType}_id, account_id) VALUES ($1,$2) RETURNING *`;
-    const userInfos = await pool.query(queryString, [
-        user.username,
-        user.account_id
-    ]);
+    // Check exíting account
+    const record = await userServ.getOneByUsername({ acc_type, username });
+    if (record && record.length !== 0) {
+        return next(new AppError('Account is already existed', 400));
+    }
+
+    const account = await userServ.createAccount(acc_type, username, password);
+
+    const userData = {
+        username,
+        acc_type: acc_type.toLowerCase(),
+        account_id: account.account_id,
+        fullname,
+        gender,
+        dob,
+        phone,
+        addr
+    };
+    const userInfo = await userServ.createOne(userData);
 
     res.status(201).json({
         status: 'success',
         data: {
             new_user: {
-                ...user,
-                ...userInfos.rows[0]
+                ...account,
+                ...userInfo
             }
         }
     });
@@ -104,26 +96,17 @@ exports.createUser = catchAsync(async (req, res, next) => {
 
 exports.loginUser = catchAsync(async (req, res, next) => {
     console.log('User Login data: > ', req.body);
-    const { username, password } = req.body;
-    let queryString = `SELECT * FROM accounts acc WHERE acc.username = $1`;
-    const users = await pool.query(queryString, [username]);
+    const { acc_type, username, password } = req.body;
+    const record = await userServ.getOneByUsername({ acc_type, username });
 
-    if (users.rows.length === 0) {
+    if (!record || record.length === 0) {
         return next(new AppError('No user found with that username', 404));
     }
-    const result = await userService.validPassword(
-        password,
-        users.rows[0].passwd
-    );
+
+    const result = await userService.validPassword(password, record.passwd);
+
     if (!result) return next(new AppError('Password is incorrect', 404));
-    let user = users.rows[0];
-    // populate data
-    accType = user.acc_type.toLowerCase() + 's';
-    queryString = `SELECT * FROM ${accType} WHERE account_id = $1`;
-
-    const userInfo = await pool.query(queryString, [user.account_id]);
-
-    user = { ...user, ...userInfo.rows[0] };
+    let user = { ...record };
 
     let dataPayload = {
         account_id: user.account_id,
@@ -140,9 +123,8 @@ exports.loginUser = catchAsync(async (req, res, next) => {
         refreshTokenLife
     );
 
-    queryString =
-        'UPDATE Accounts SET refresh_token = $1 WHERE account_id = $2';
-    await pool.query(queryString, [refreshToken, user.account_id]);
+    let sql = 'UPDATE Accounts SET refresh_token = $1 WHERE account_id = $2';
+    await pool.query(sql, [refreshToken, user.account_id]);
 
     res.cookie('refresh_token', refreshToken, { httpOnly: true });
 
@@ -159,30 +141,24 @@ exports.loginUser = catchAsync(async (req, res, next) => {
 exports.updateUser = catchAsync(async (req, res, next) => {
     const { user_id } = req.params;
     const { acc_type, fullname, gender, dob, phone, addr } = req.body;
-
-    const queryString = `UPDATE ${acc_type}s 
-                            SET fullname = $1,
-                                gender = $2,
-                                dob = $3,
-                                phone = $4,
-                                addr = $5
-                            WHERE account_id = $6 RETURNING *`;
-
-    const updatedUser = await pool.query(queryString, [
+    const userData = {
+        user_id,
+        acc_type,
         fullname,
         gender,
         dob,
         phone,
-        addr,
-        user_id
-    ]);
-    if (updatedUser.rows.length === 0) {
-        return next(new AppError('No user found with that id', 404));
+        addr
+    };
+    const record = await userServ.updateOne(userData);
+
+    if (!record || record.length === 0) {
+        return next(new AppError('Failed when updating the record', 400));
     }
     res.status(201).json({
         status: 'success',
         data: {
-            user: updatedUser.rows[0]
+            user: record
         }
     });
 });
