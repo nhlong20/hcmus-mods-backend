@@ -35,7 +35,7 @@ app.get('/api', async (req,res) => {
     })
 })
 app.use('/api/users', userRouter)
-app.use('/api/course', courseRouter)
+app.use('/api/courses', courseRouter)
 // app.use('/feedback', feedbackRouter);
 
 //REDIRECT WRONG URL.
