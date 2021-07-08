@@ -27,6 +27,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error-controller');
 const userRouter = require('./routes/user-route');
 const courseRouter = require('./routes/course-route');
+const subjectRouter = require('./routes/subject-route');
 
 app.get('/api', async (req,res) => {
     res.status(200).json({
@@ -36,7 +37,7 @@ app.get('/api', async (req,res) => {
 })
 app.use('/api/users', userRouter)
 app.use('/api/courses', courseRouter)
-// app.use('/feedback', feedbackRouter);
+app.use('/api/subjects', subjectRouter);
 
 //REDIRECT WRONG URL.
 app.all('*', (req, res, next) => {
