@@ -22,9 +22,11 @@ exports.aliasTopUsers = (req, res, next) => {
 exports.getUsers = catchAsync(async (req, res, next) => {
     filter = {};
     if (req.query.limit) filter = { ...filter, limit: req.query.limit };
-    const { acc_type } = req.body
-    if(!acc_type){
-        return next(new AppError('You must include acc_type to json request', 400));
+    const { acc_type } = req.body;
+    if (!acc_type) {
+        return next(
+            new AppError('You must include acc_type to json request', 400)
+        );
     }
 
     const queryString = `SELECT * FROM accounts acc
@@ -44,18 +46,20 @@ exports.getUsers = catchAsync(async (req, res, next) => {
 
 exports.getUser = catchAsync(async (req, res, next) => {
     const { user_id } = req.params;
-    const { acc_type } = req.body
-    if(!acc_type){
-        return next(new AppError('You must include acc_type to json request', 400));
+    const { acc_type } = req.body;
+    if (!acc_type) {
+        return next(
+            new AppError('You must include acc_type to json request', 400)
+        );
     }
-    
+
     const queryString = `SELECT * 
     FROM accounts acc 
      NATURAL JOIN ${acc_type}s s 
      WHERE acc.account_id = s.account_id AND acc.account_id = $1`;
     const users = await pool.query(queryString, [user_id]);
 
-    if(users.rows.length === 0){
+    if (users.rows.length === 0) {
         return next(new AppError('No user found with that username', 404));
     }
     let user = users.rows[0];
@@ -154,7 +158,8 @@ exports.loginUser = catchAsync(async (req, res, next) => {
 
 exports.updateUser = catchAsync(async (req, res, next) => {
     const { user_id } = req.params;
-    const {acc_type, fullname, gender, dob, phone, addr} = req.body
+    const { acc_type, fullname, gender, dob, phone, addr } = req.body;
+
     const queryString = `UPDATE ${acc_type}s 
                             SET fullname = $1,
                                 gender = $2,
@@ -163,16 +168,36 @@ exports.updateUser = catchAsync(async (req, res, next) => {
                                 addr = $5
                             WHERE account_id = $6 RETURNING *`;
 
-    const updatedUser = await pool.query(queryString, [fullname, gender, dob, phone, addr, user_id]);
-    let user = updatedUser.rows[0]
+    const updatedUser = await pool.query(queryString, [
+        fullname,
+        gender,
+        dob,
+        phone,
+        addr,
+        user_id
+    ]);
+    if (updatedUser.rows.length === 0) {
+        return next(new AppError('No user found with that id', 404));
+    }
     res.status(201).json({
         status: 'success',
         data: {
-            user
+            user: updatedUser.rows[0]
         }
     });
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-   
+    const { user_id } = req.params;
+    const { acc_type } = req.body;
+    let queryString = `DELETE FROM ${acc_type}s s WHERE s.account_id = $1 RETURNING *`;
+    await pool.query(queryString, [user_id]);
+
+    queryString = `DELETE FROM accounts s WHERE s.account_id = $1`;
+    await pool.query(queryString, [user_id]);
+
+    res.status(204).json({
+        status: 'success',
+        data: {}
+    });
 });
