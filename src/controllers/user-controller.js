@@ -139,31 +139,9 @@ exports.loginUser = catchAsync(async (req, res, next) => {
 });
 
 exports.updateUser = catchAsync(async (req, res, next) => {
-    const { user_id } = req.params;
-    const text = `SELECT * FROM accounts acc WHERE acc.account_id = $1`;
-
-    const users = await pool.query(text, [user_id]);
-    const user = users.rows[0];
-
-    res.status(201).json({
-        status: 'success',
-        data: {
-            user
-        }
-    });
+  
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-    const { user_id } = req.params;
-    const text = `SELECT * FROM accounts acc WHERE acc.account_id = $1`;
-
-    const users = await pool.query(text, [user_id]);
-    const user = users.rows[0];
-
-    res.status(201).json({
-        status: 'success',
-        data: {
-            user
-        }
-    });
+   
 });

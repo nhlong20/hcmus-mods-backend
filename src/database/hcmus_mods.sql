@@ -249,9 +249,6 @@ INSERT INTO Subjects (subject_id, name, credits) VALUES ('LTUDW', 'Lập trình 
 UPDATE Subjects SET prerequisite_subject = 'CTDLGT'
 WHERE subject_id != 'CTDLGT';
 
-UPDATE Subjects SET prerequisite_subject = 'OOP'
-WHERE subject_id = 'CTDLGT';
-
 INSERT INTO Semesters(semester_id, sem_name, sem_year, start_date, end_date) VALUES (default, 'HK1', 2019, '2019-08-20', '2020-01-20');
 INSERT INTO Semesters(semester_id, sem_name, sem_year, start_date, end_date) VALUES (default, 'HK2', 2019, '2020-02-03', '2020-06-28');
 
