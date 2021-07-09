@@ -24,3 +24,20 @@ exports.createOne = async subject => {
     ]);
     return records.rows[0];
 };
+
+exports.updateOne = async subject => {
+    const sql = `UPDATE subjects 
+    SET prerequisite_subject = $1,
+        name = $2,
+        credits = $3
+    WHERE subject_id = $4 RETURNING *`;
+    console.log(subject)
+    const records = await pool.query(sql, [
+        subject.prerequisite_subject,
+        subject.name,
+        subject.credits,
+        subject.subject_id
+    ]);
+    console.log(records)
+    return records.rows[0];
+};

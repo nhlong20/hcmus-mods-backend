@@ -46,9 +46,36 @@ exports.createOne = catchAsync(async (req, res, next) => {
     const record = await subjectServ.createOne(subject);
 
     if (!record || record.length === 0) {
-        return next(new AppError('Some thing went wrong when creating new subject, try again', 400));
+        return next(
+            new AppError(
+                'Some thing went wrong when creating new subject, try again',
+                400
+            )
+        );
     }
-    res.status(200).json({
+    res.status(201).json({
+        status: 'success',
+        data: {
+            subject: record
+        }
+    });
+});
+
+exports.updateOne = catchAsync(async (req, res, next) => {
+    const { subject_id } = req.params;
+    const { prerequisite_subject, name, credits } = req.body;
+    const subject = { subject_id, prerequisite_subject, name, credits };
+    const record = await subjectServ.updateOne(subject);
+
+    if (!record || record.length === 0) {
+        return next(
+            new AppError(
+                'Some thing went wrong when updating new record, try again',
+                400
+            )
+        );
+    }
+    res.status(201).json({
         status: 'success',
         data: {
             subject: record

@@ -4,8 +4,12 @@ const handleCastErrorDB = err => {
     return new AppError(message, 400);
 };
 const handleDuplicateFieldsDB = err => {
-    const value = err.errmsg.match(/(["'])(?:\\.|[^\\])*?\1/);
-    const message = `${value} is already existed`;
+    // const value = err.detail.match(/(["'])(?:\\.|[^\\])*?\1/);
+    const message = `record is already existed`;
+    return new AppError(message, 400);
+};
+const handleVioletForeignKeyDB = err => {
+    const message = `your data violates foreign key constraint`;
     return new AppError(message, 400);
 };
 const handleValidatorErrorDB = err => {
@@ -42,7 +46,6 @@ const sendErrorProd = (err, res) => {
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
-
     if (process.env.NODE_ENV === 'development') {
         sendErrorDev(err, res);
     } else if (process.env.NODE_ENV === 'production') {
@@ -51,8 +54,12 @@ module.exports = (err, req, res, next) => {
             error = handleCastErrorDB(error);
             sendErrorProd(error, res);
         }
-        if (err.code === 11000) {
+        if (err.code === "23505") {
             error = handleDuplicateFieldsDB(error);
+            sendErrorProd(error, res);
+        }
+        if (err.code === "23503") {
+            error = handleVioletForeignKeyDB(error);
             sendErrorProd(error, res);
         }
         if (error.name === 'ValidationError') {

@@ -6,6 +6,8 @@ const authServ = require('../services/auth-service');
 
 router.post('/', subjectCtrl.createOne);
 router.get('/:subject_id', subjectCtrl.getOne);
+
+router.patch('/:subject_id', subjectCtrl.updateOne);
 router.route('/').get(subjectCtrl.getAll);
 
 module.exports = router;
