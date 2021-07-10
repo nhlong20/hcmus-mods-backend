@@ -4,9 +4,11 @@ const AppError = require('./../utils/appError');
 const courseServ = require('../services/course-service');
 
 exports.getAll = catchAsync(async (req, res, next) => {
-    let filter = {};
-    if (req.query.limit) filter = { ...filter, limit: req.query.limit };
-    const courses = await courseServ.getCourses(filter);
+    let { limit, offset } = req.query;
+    const filter = {};
+    limit = Number.parseInt(limit);
+    filter.limit = limit && limit >= 0 ? limit : null;
+    filter.offset = offset || 0;
 
     if (!courses || courses.length === 0) {
         return next(new AppError('No record found', 404));
