@@ -1,42 +1,36 @@
-const jwt = require("jsonwebtoken");
+const { promisify } = require('util');
+const jwt = require('jsonwebtoken');
 /**
  * private function generateToken
  * @param data
  * @param secretSignature
  * @param tokenLife
  */
-let generateToken = async (userData, privateKey, tokenLife, admin = false) => {
-  try {
-    let payload = { user: userData, admin: admin };
-    let signOptions = {
-      issuer: "Hcmus Mods",
-      algorithm: "HS256",
-      expiresIn: tokenLife
+let generateToken = (userData, privateKey, tokenLife, admin = false) => {
+    try {
+        let payload = { user: userData, admin: admin };
+        let signOptions = {
+            issuer: 'Hcmus Mods',
+            algorithm: 'HS256',
+            expiresIn: tokenLife
+        };
+        // jwt.sign return a Promise
+        let token = jwt.sign(payload, privateKey, signOptions);
+        return token;
+    } catch (err) {
+        return new Error(err);
     }
-    // jwt.sign return a Promise
-    let token = await jwt.sign(payload, privateKey, signOptions);
-    return token;
-  } catch (err) {
-    return new Error(err);
-  }
-}
+};
 /**
  * This module used for verify jwt token
  * @param {*} token
  * @param {*} secretKey
  */
-let verifyToken = (token, secretKey) => { 
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, secretKey, (error, decoded) => {
-      if (error) {
-        return reject(error);
-      }
-      return resolve(decoded);
-    });
-  });
-}
+let verifyToken = async (token, secretKey) => {
+    return await promisify(jwt.verify)(token, secretKey);
+};
 
 module.exports = {
-  generateToken: generateToken,
-  verifyToken: verifyToken,
+    generateToken: generateToken,
+    verifyToken: verifyToken
 };
