@@ -35,3 +35,10 @@ exports.updateOne = async review => {
     ]);
     return records.rows[0];
 };
+
+exports.deleteOne = async _id => {
+    const sql = `DELETE FROM reviews 
+                WHERE review_id = $1 RETURNING *`;
+    const records = await pool.query(sql, [_id]);
+    return records.rows[0];
+};

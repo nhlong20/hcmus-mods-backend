@@ -82,3 +82,13 @@ exports.updateOne = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+exports.deleteOne = catchAsync(async (req, res, next) => {
+    const { review_id } = req.params;
+    await reviewServ.deleteOne(review_id);
+    res.status(204).json({
+        status: 'success',
+        data: {
+        }
+    });
+});
