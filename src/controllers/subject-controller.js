@@ -4,10 +4,10 @@ const AppError = require('./../utils/appError');
 const subjectServ = require('../services/subject-service');
 
 exports.getAll = catchAsync(async (req, res, next) => {
-    const { limit, offset } = req.query;
+    let { limit, offset } = req.query;
     const filter = {};
-    filter.limit =
-        (Number.parseInt(limit) && Number.parseInt(limit) >= 0) || null;
+    limit = Number.parseInt(limit);
+    filter.limit = limit && limit >= 0 ? limit : null;
     filter.offset = offset || 0;
 
     const records = await subjectServ.getAll(filter);

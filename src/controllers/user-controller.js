@@ -5,9 +5,12 @@ const pool = require('../database');
 const userServ = require('../services/user-service');
 
 exports.getUsers = catchAsync(async (req, res, next) => {
-    let filter = {};
-    if (req.query.limit) filter = { ...filter, limit: req.query.limit };
-    if (req.query.offset) filter = { ...filter, offset: req.query.offset };
+    let { limit, offset } = req.query;
+    const filter = {};
+    limit = Number.parseInt(limit);
+    filter.limit = limit && limit >= 0 ? limit : null;
+    filter.offset = offset || 0;
+
     const { acc_type } = req.body;
     if (!acc_type) {
         return next(
