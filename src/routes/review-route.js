@@ -9,11 +9,10 @@ router.use(authCtrl.protect);
 router
   .route('/')
   .get(reviewCtrl.getAll)
-  // .post(
-  //   authCtrl.restrictTo('user'),
-  //   reviewCtrl.setTourUserIds,
-  //   reviewCtrl.createOne
-  // );
+  .post(
+    // reviewCtrl.setTourUserIds,
+    reviewCtrl.createOne
+  );
 
 // router
 //   .route('/:id')

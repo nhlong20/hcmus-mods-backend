@@ -166,7 +166,7 @@ exports.protect = catchAsync(async (req, res, next) => {
         acc_type: user.acc_type,
         user_id: user.account_id
     });
-
+    currentUser.passwd = undefined
     // 4 - Check if user changed password after the token was issued (Not done yet)
     req.user = currentUser;
     req.payload = decoded;

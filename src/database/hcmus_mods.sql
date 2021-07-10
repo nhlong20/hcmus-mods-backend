@@ -137,7 +137,7 @@ CREATE TABLE Lectures (
   );
 
 CREATE TABLE Reviews (
-  review_id  SERIAL NOT NULL, 
+  review_id  UUID  NOT NULL, 
   course_id  varchar(20) NOT NULL, 
   account_id integer NOT NULL,
   review_body varchar(360),
