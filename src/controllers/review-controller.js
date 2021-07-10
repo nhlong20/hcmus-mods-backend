@@ -9,7 +9,7 @@ exports.getAll = catchAsync(async (req, res, next) => {
     limit = Number.parseInt(limit);
     filter.limit = limit && limit >= 0 ? limit : null;
     filter.offset = offset || 0;
-    
+
     const records = await reviewServ.getAll(filter);
     if (!records || records.length === 0) {
         return next(new AppError('No record found', 404));
@@ -77,10 +77,12 @@ exports.updateOne = catchAsync(async (req, res, next) => {
             )
         );
     }
+    const updatedReview = await reviewServ.getOne(record.review_id);
+
     res.status(201).json({
         status: 'success',
         data: {
-            review: record
+            review: updatedReview
         }
     });
 });
