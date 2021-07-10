@@ -12,10 +12,10 @@ router
         authCtrl.restrictTo('admin', 'morderator'),
         subjectCtrl.createOne
     );
-    
+
 router
     .route('/:subject_id')
-    .get('/:subject_id', subjectCtrl.getOne)
+    .get(subjectCtrl.getOne)
     .patch(
         authCtrl.protect,
         authCtrl.restrictTo('admin', 'morderator'),
