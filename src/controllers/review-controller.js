@@ -54,10 +54,12 @@ exports.createOne = catchAsync(async (req, res, next) => {
             )
         );
     }
+    const newReview = await reviewServ.getOne(record.review_id);
+
     res.status(201).json({
         status: 'success',
         data: {
-            review: record
+            review: newReview
         }
     });
 });
