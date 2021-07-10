@@ -23,21 +23,20 @@ exports.getAll = catchAsync(async (req, res, next) => {
     });
 });
 exports.getOne = catchAsync(async (req, res, next) => {
-  const { review_id } = req.params;
-  const record = await reviewServ.getOne(review_id);
+    const { review_id } = req.params;
+    const record = await reviewServ.getOne(review_id);
 
-  if (!record || record.length === 0) {
-      return next(new AppError('No record found with that id', 404));
-  }
+    if (!record || record.length === 0) {
+        return next(new AppError('No record found with that id', 404));
+    }
 
-  res.status(200).json({
-      status: 'success',
-      data: {
-          review: record
-      }
-  });
+    res.status(200).json({
+        status: 'success',
+        data: {
+            review: record
+        }
+    });
 });
-
 
 exports.createOne = catchAsync(async (req, res, next) => {
     const { course_id } = req.params;
@@ -58,7 +57,28 @@ exports.createOne = catchAsync(async (req, res, next) => {
     res.status(201).json({
         status: 'success',
         data: {
-          review: record
+            review: record
+        }
+    });
+});
+
+exports.updateOne = catchAsync(async (req, res, next) => {
+    const { review_id } = req.params;
+    const { review_body } = req.body;
+    const review = { review_id, review_body };
+    const record = await reviewServ.updateOne(review);
+    if (!record || record.length === 0) {
+        return next(
+            new AppError(
+                'Some thing went wrong when updating new record, try again',
+                400
+            )
+        );
+    }
+    res.status(201).json({
+        status: 'success',
+        data: {
+            review: record
         }
     });
 });

@@ -10,17 +10,16 @@ router
   .route('/')
   .get(reviewCtrl.getAll)
   .post(
-    // reviewCtrl.setTourUserIds,
     reviewCtrl.createOne
   );
 
 router
   .route('/:review_id')
   .get(reviewCtrl.getOne)
-//   .patch(
-//     authCtrl.restrictTo('user', 'admin'),
-//     reviewCtrl.updateReview
-//   )
+  .patch(
+    authCtrl.isReviewOwner,
+    reviewCtrl.updateOne
+  )
 //   .delete(
 //     authCtrl.restrictTo('user', 'admin'),
 //     reviewCtrl.deleteReview
