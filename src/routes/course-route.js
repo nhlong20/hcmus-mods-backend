@@ -1,10 +1,12 @@
-var express = require('express');
+const express = require('express');
 const courseCtrl = require('../controllers/course-controller');
 const authCtrl = require('../controllers/auth-controller');
+const reviewRouter = require('./../routes/review-route');
 
-var router = express.Router();
+const router = express.Router();
 
-router.get('/:course_id', courseCtrl.getOne);
+router.use('/:course_id/reviews', reviewRouter);
+
 router
     .route('/')
     .get(courseCtrl.getAll)
@@ -13,5 +15,7 @@ router
         authCtrl.restrictTo('admin', 'morderator', 'teacher'),
         courseCtrl.createOne
     );
+
+router.get('/:course_id', courseCtrl.getOne);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const catchAsync = require('../utils/catchAsync');
 const jwthelper = require('../utils/jsonwebtoken');
 const AppError = require('./../utils/appError');
 const userServ = require('../services/user-service');
+const reviewServ = require('../services/review-service');
 
 const accessTokenLife = process.env.ACCESS_TOKEN_LIFE || '1h';
 const accessTokenSecret =
@@ -137,12 +138,13 @@ exports.logout = (req, res) => {
 exports.protect = catchAsync(async (req, res, next) => {
     // Getting token and check token's existance
     let token = null;
+
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')
     ) {
         token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies.jwt) {
+    } else if (req.cookies && req.cookies.jwt) {
         token = req.cookies.jwt;
     }
     if (!token) {
@@ -165,7 +167,7 @@ exports.protect = catchAsync(async (req, res, next) => {
         acc_type: user.acc_type,
         user_id: user.account_id
     });
-
+    currentUser.passwd = undefined;
     // 4 - Check if user changed password after the token was issued (Not done yet)
     req.user = currentUser;
     req.payload = decoded;
@@ -186,3 +188,23 @@ exports.restrictTo = (...roles) => {
         next();
     };
 };
+
+exports.isReviewOwner = catchAsync(async (req, res, next) => {
+    const { review_id } = req.params;
+    const review = await reviewServ.getOne(review_id);
+
+    if (!review || review.length === 0) {
+        return next(new AppError('No record found with that id', 404));
+    }
+
+    if (review.account_id === req.user.account_id) {
+        return next();
+    }
+
+    return next(
+        new AppError(
+            'You have no permission to modify review of another user',
+            400
+        )
+    );
+});

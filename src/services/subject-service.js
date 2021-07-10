@@ -1,4 +1,3 @@
-const AppError = require('../utils/appError');
 const pool = require('../database');
 
 exports.getAll = async filter => {
@@ -31,13 +30,11 @@ exports.updateOne = async subject => {
         name = $2,
         credits = $3
     WHERE subject_id = $4 RETURNING *`;
-    console.log(subject)
     const records = await pool.query(sql, [
         subject.prerequisite_subject,
         subject.name,
         subject.credits,
         subject.subject_id
     ]);
-    console.log(records)
     return records.rows[0];
 };
