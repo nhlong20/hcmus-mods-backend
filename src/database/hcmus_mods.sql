@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS Accounts CASCADE;
 DROP TABLE IF EXISTS Teachers CASCADE;
 DROP TABLE IF EXISTS Moderators CASCADE;
-DROP TABLE IF EXISTS Admin CASCADE;
+DROP TABLE IF EXISTS Admins CASCADE;
 DROP TABLE IF EXISTS Shifts CASCADE;
 DROP TABLE IF EXISTS Subjects CASCADE;
 DROP TABLE IF EXISTS Student_Course CASCADE;
@@ -27,7 +27,7 @@ CREATE TABLE Accounts (
   );
 
 CREATE TABLE Teachers (
-  teacher_id SERIAL NOT NULL, 
+  teacher_id varchar(20) NOT NULL, 
   account_id integer NOT NULL,
   fullname varchar(50),
   gender varchar(3) CHECK (gender in ('Nam', 'Nữ')),
@@ -37,7 +37,7 @@ CREATE TABLE Teachers (
   );
 
 CREATE TABLE Moderators (
-  moderator_id SERIAL NOT NULL, 
+  moderator_id varchar(20) NOT NULL, 
   account_id   integer NOT NULL,
   fullname     varchar(50),
   gender       varchar(3) CHECK (gender in ('Nam', 'Nữ')),
@@ -46,8 +46,8 @@ CREATE TABLE Moderators (
   addr         varchar(100)
   );
 
-CREATE TABLE Admin (
-  admin_id   SERIAL NOT NULL, 
+CREATE TABLE Admins (
+  admin_id   varchar(20) NOT NULL, 
   account_id integer NOT NULL,
   fullname   varchar(50),
   gender     varchar(3) CHECK (gender in ('Nam', 'Nữ')),
@@ -80,7 +80,7 @@ CREATE TABLE Courses (
   subject_id  varchar(10) NOT NULL, 
   shift_id    integer NOT NULL, 
   semester_id integer NOT NULL, 
-  teacher_id  integer NOT NULL,
+  teacher_id  varchar(20) NOT NULL,
   day_of_week varchar(10) NOT NULL CHECK (day_of_week in ('Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ Nhật')),
   room varchar(10)
   );
@@ -170,7 +170,7 @@ CREATE TABLE Appendix (
 ALTER TABLE Accounts ADD PRIMARY KEY (account_id);
 ALTER TABLE Teachers ADD PRIMARY KEY (teacher_id);
 ALTER TABLE Moderators ADD PRIMARY KEY (moderator_id);
-ALTER TABLE Admin ADD PRIMARY KEY (admin_id);
+ALTER TABLE Admins ADD PRIMARY KEY (admin_id);
 ALTER TABLE Shifts ADD PRIMARY KEY (shift_id);
 ALTER TABLE Subjects ADD PRIMARY KEY (subject_id);
 ALTER TABLE Courses ADD PRIMARY KEY (course_id);
@@ -215,7 +215,7 @@ ALTER TABLE Courses ADD CONSTRAINT FK_course__shift_id FOREIGN KEY (shift_id) RE
 ALTER TABLE Student_Course ADD CONSTRAINT FKStudent_Co197422 FOREIGN KEY (student_id) REFERENCES Students (student_id);
 ALTER TABLE Teachers ADD CONSTRAINT FK_teacher__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
 ALTER TABLE Moderators ADD CONSTRAINT FK_moderator__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
-ALTER TABLE Admin ADD CONSTRAINT FKAdmin915765 FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
+ALTER TABLE Admins ADD CONSTRAINT FKAdmin915765 FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
 ALTER TABLE Courses ADD CONSTRAINT FK_course__semester_id FOREIGN KEY (semester_id) REFERENCES Semesters (semester_id);
 ALTER TABLE Courses ADD CONSTRAINT FK_course__teacher_id FOREIGN KEY (teacher_id) REFERENCES Teachers (teacher_id);
 ALTER TABLE Modules ADD CONSTRAINT fk_module__course_id FOREIGN KEY (course_id) REFERENCES Courses (course_id);
@@ -234,7 +234,7 @@ ALTER TABLE Reviews ADD CONSTRAINT FKReviews562743 FOREIGN KEY (account_id) REFE
 INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120449', '18120449', default);
 INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120460', '18120460', default);
 INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120461', '18120461', default);
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'teacher', 'GV001', 'GV001', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'teacher', 'gv001', 'gv001', default);
 
 INSERT INTO Subjects (subject_id, name, credits) VALUES ('OOP', 'Lập trình hướng đối tượng', 4);
 INSERT INTO Subjects (subject_id, name, credits) VALUES ('CTDLGT', 'Cấu trúc dữ liệu và giải thuật', 4);
@@ -260,18 +260,18 @@ INSERT INTO Shifts(shift_id, start_at, end_at) VALUES (2, '09:30:00', '11:30:00'
 INSERT INTO Shifts(shift_id, start_at, end_at) VALUES (3, '13:30:00', '15:30:00');
 INSERT INTO Shifts(shift_id, start_at, end_at) VALUES (4, '15:30:00', '17:30:00');
 
-INSERT INTO Teachers (teacher_id, fullname, gender, dob, account_id) VALUES (default, 'Hồ Tuấn Thanh', 'Nam','1998-04-01', 4);
+INSERT INTO Teachers (teacher_id, fullname, gender, dob, account_id) VALUES ('gv001', 'Hồ Tuấn Thanh', 'Nam','1998-04-01', 4);
 
 INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120449', 'Nguyễn Hoàng Long', 'Nam', '2000-04-01', 'Nghệ An',  1);
 INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120460', 'Lê Danh Lưu', 'Nam', '2000-09-06', 'Đắk Lắk', 2);
 INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120461', 'Trần Nhật Quang', 'Nam', '2000-05-21', 'Bình Thuận', 3);
 
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2011', 'OOP', 1, 'Thứ 4', 3, 1, 'F102');
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2021', 'CSDL', 1, 'Thứ 5', 1, 2,'F106');
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2012', 'OOP', 1, 'Thứ 4', 3, 2, 'F103');
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2031', 'HDH', 1, 'Thứ 2', 3, 1, 'E104');
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2041', 'MMT', 1, 'Thứ 7', 1, 2, 'F202');
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2051', 'CTDLGT', 1, 'Thứ 3', 4, 2, 'E305');
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('SE2111', 'DAAS', 1, 'Thứ 4', 2, 2, 'E204');
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2121', 'NMHM', 1, 'Thứ 6', 3, 2, 'G102');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2011', 'OOP', 'gv001', 'Thứ 4', 3, 1, 'F102');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2021', 'CSDL', 'gv001', 'Thứ 5', 1, 2,'F106');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2012', 'OOP', 'gv001', 'Thứ 4', 3, 2, 'F103');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2031', 'HDH', 'gv001', 'Thứ 2', 3, 1, 'E104');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2041', 'MMT', 'gv001', 'Thứ 7', 1, 2, 'F202');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2051', 'CTDLGT', 'gv001', 'Thứ 3', 4, 2, 'E305');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('SE2111', 'DAAS', 'gv001', 'Thứ 4', 2, 2, 'E204');
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room) VALUES ('CS2121', 'NMHM', 'gv001', 'Thứ 6', 3, 2, 'G102');
 

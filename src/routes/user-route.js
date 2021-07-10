@@ -1,22 +1,26 @@
-var express = require('express');
-var router = express.Router();
-
+const express = require('express');
 const userCtrl = require('../controllers/user-controller');
-
 const authCtrl = require('../controllers/auth-controller');
 
-router.post('/', authCtrl.register);
+const router = express.Router();
+
+router.post('/signup', authCtrl.signup);
 router.post('/login', authCtrl.login);
 router.get('/logout', authCtrl.logout);
 
-router.get('/', userCtrl.getUsers);
+// TODO - forgot password route
+// TODO - reset password route
 
-router.use(authCtrl.protect); // req.payload
+// Protect all routes after this middleware
+router.use(authCtrl.protect);
 
-router.route('/:user_id')
+router
+    .route('/:user_id')
+    .get(userCtrl.getUser)
     .patch(userCtrl.updateUser)
     .delete(userCtrl.deleteUser);
-router.route('/:user_id')
-    .get(userCtrl.getUser)
-    
+
+router.use(authCtrl.restrictTo('admin'));
+router.route('/').get(userCtrl.getUsers).post(userCtrl.createUser);
+
 module.exports = router;

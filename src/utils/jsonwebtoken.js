@@ -6,9 +6,9 @@ const jwt = require('jsonwebtoken');
  * @param secretSignature
  * @param tokenLife
  */
-let generateToken = (userData, privateKey, tokenLife, admin = false) => {
+let generateToken = (userData, privateKey, tokenLife) => {
     try {
-        let payload = { user: userData, admin: admin };
+        let payload = { user: userData};
         let signOptions = {
             issuer: 'Hcmus Mods',
             algorithm: 'HS256',
