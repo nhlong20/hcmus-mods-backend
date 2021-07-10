@@ -2,13 +2,17 @@ const pool = require('../database');
 const { v4: uuidv4 } = require('uuid');
 
 exports.getAll = async filter => {
-    let sql = `SELECT * from reviews LIMIT $1 OFFSET $2`;
+    let sql = `SELECT * from reviews r
+                NATURAL JOIN students s 
+                LIMIT $1 OFFSET $2`;
     const records = await pool.query(sql, [filter.limit, filter.offset]);
     return records.rows;
 };
 
 exports.getOne = async _id => {
-    const sql = `SELECT * from reviews WHERE review_id = $1`;
+    const sql = `SELECT * from reviews r
+                  NATURAL JOIN students s 
+                  WHERE r.review_id = $1`;
     const records = await pool.query(sql, [_id]);
     return records.rows[0];
 };
