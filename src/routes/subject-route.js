@@ -1,13 +1,25 @@
-var express = require('express');
-var router = express.Router();
-
+const express = require('express');
 const subjectCtrl = require('../controllers/subject-controller');
-const authServ = require('../services/auth-service');
+const authCtrl = require('../controllers/auth-controller');
 
-router.post('/', subjectCtrl.createOne);
-router.get('/:subject_id', subjectCtrl.getOne);
+const router = express.Router();
 
-router.patch('/:subject_id', subjectCtrl.updateOne);
-router.route('/').get(subjectCtrl.getAll);
+router
+    .route('/')
+    .get(subjectCtrl.getAll)
+    .post(
+        authCtrl.protect,
+        authCtrl.restrictTo('admin', 'morderator'),
+        subjectCtrl.createOne
+    );
+
+router
+    .route('/:subject_id')
+    .get(subjectCtrl.getOne)
+    .patch(
+        authCtrl.protect,
+        authCtrl.restrictTo('admin', 'morderator'),
+        subjectCtrl.updateOne
+    );
 
 module.exports = router;

@@ -8,6 +8,12 @@ exports.validPassword = function (inputPwd, userPwd) {
     return bcrypt.compareSync(inputPwd, userPwd);
 };
 
+exports.getAccount = async _id => {
+    const sql = `SELECT * FROM accounts WHERE account_id = $1`;
+    const record = await pool.query(sql, [_id]);
+    return record.rows[0];
+};
+
 exports.getAll = async (filter, acc_type) => {
     const sql = `SELECT * FROM accounts acc
               NATURAL JOIN ${acc_type}s s
@@ -52,7 +58,7 @@ exports.createOne = async user => {
                   (${user.acc_type}_id, account_id, fullname, gender, dob, phone, addr) 
                   VALUES ($1,$2,$3,$4,$5,$6,$7) 
                   RETURNING *`;
-
+    console.log(sql);
     const record = await pool.query(sql, [
         user.username,
         user.account_id,
