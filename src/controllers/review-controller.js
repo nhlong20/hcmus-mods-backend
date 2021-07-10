@@ -22,6 +22,22 @@ exports.getAll = catchAsync(async (req, res, next) => {
         }
     });
 });
+exports.getOne = catchAsync(async (req, res, next) => {
+  const { review_id } = req.params;
+  const record = await reviewServ.getOne(review_id);
+
+  if (!record || record.length === 0) {
+      return next(new AppError('No record found with that id', 404));
+  }
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          review: record
+      }
+  });
+});
+
 
 exports.createOne = catchAsync(async (req, res, next) => {
     const { course_id } = req.params;

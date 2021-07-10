@@ -14,9 +14,9 @@ router
     reviewCtrl.createOne
   );
 
-// router
-//   .route('/:id')
-//   .get(reviewCtrl.getReview)
+router
+  .route('/:review_id')
+  .get(reviewCtrl.getOne)
 //   .patch(
 //     authCtrl.restrictTo('user', 'admin'),
 //     reviewCtrl.updateReview
