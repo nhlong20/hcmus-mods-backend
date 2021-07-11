@@ -14,9 +14,9 @@ exports.getAll = acc_type => {
 
         const records = await userServ.getAll(filter, acc_type);
 
-        if (!records || records.length === 0) {
-            return next(new AppError('No record found', 404));
-        }
+        // if (!records || records.length === 0) {
+        //     return next(new AppError('No record found', 404));
+        // }
 
         res.status(200).json({
             status: 'success',
@@ -31,9 +31,9 @@ exports.getOne = acc_type => {
     return catchAsync(async (req, res, next) => {
         const { user_id } = req.params;
         const record = await userServ.getOne({ user_id, acc_type: acc_type });
-        if (!record || record.length === 0) {
-            return next(new AppError('No record found with that id', 404));
-        }
+        // if (!record || record.length === 0) {
+        //     return next(new AppError('No record found with that id', 404));
+        // }
         res.status(200).json({
             status: 'success',
             data: {

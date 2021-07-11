@@ -11,9 +11,9 @@ exports.getAll = catchAsync(async (req, res, next) => {
     filter.offset = offset || 0;
 
     const records = await subjectServ.getAll(filter);
-    if (!records || records.length === 0) {
-        return next(new AppError('No record found', 404));
-    }
+    // if (!records || records.length === 0) {
+    //     return next(new AppError('No record found', 404));
+    // }
 
     res.status(200).json({
         status: 'success',
@@ -27,9 +27,9 @@ exports.getOne = catchAsync(async (req, res, next) => {
     const { subject_id } = req.params;
     const record = await subjectServ.getOne(subject_id);
 
-    if (!record || record.length === 0) {
-        return next(new AppError('No record found with that id', 404));
-    }
+    // if (!record || record.length === 0) {
+    //     return next(new AppError('No record found with that id', 404));
+    // }
 
     res.status(200).json({
         status: 'success',

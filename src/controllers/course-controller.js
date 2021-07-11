@@ -12,9 +12,9 @@ exports.getAll = catchAsync(async (req, res, next) => {
 
     const courses = await courseServ.getAll(filter);
 
-    if (!courses || courses.length === 0) {
-        return next(new AppError('No record found', 404));
-    }
+    // if (!courses || courses.length === 0) {
+    //     return next(new AppError('No record found', 404));
+    // }
 
     res.status(200).json({
         status: 'success',
@@ -28,9 +28,9 @@ exports.getOne = catchAsync(async (req, res, next) => {
     const { course_id } = req.params;
 
     const course = await courseServ.getOne(course_id);
-    if (!course || course.length === 0) {
-        return next(new AppError('No record found with that id', 404));
-    }
+    // if (!course || course.length === 0) {
+    //     return next(new AppError('No record found with that id', 404));
+    // }
 
     res.status(201).json({
         status: 'success',
