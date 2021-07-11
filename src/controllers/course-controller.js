@@ -15,6 +15,7 @@ exports.getAll = catchAsync(async (req, res, next) => {
     if (!courses || courses.length === 0) {
         return next(new AppError('No record found', 404));
     }
+
     res.status(200).json({
         status: 'success',
         data: {
@@ -25,10 +26,12 @@ exports.getAll = catchAsync(async (req, res, next) => {
 
 exports.getOne = catchAsync(async (req, res, next) => {
     const { course_id } = req.params;
-    const course = await courseServ.getCourse(course_id);
+
+    const course = await courseServ.getOne(course_id);
     if (!course || course.length === 0) {
         return next(new AppError('No record found with that id', 404));
     }
+
     res.status(201).json({
         status: 'success',
         data: {
@@ -43,6 +46,47 @@ exports.createOne = catchAsync(async (req, res, next) => {
         status: 'success',
         data: {
             course
+        }
+    });
+});
+exports.createOne = catchAsync(async (req, res, next) => {
+    const {
+        course_id,
+        subject_id,
+        shift_id,
+        semester_id,
+        teacher_id,
+        day_of_week,
+        room,
+        start_date,
+        course_length_weeks
+    } = req.body;
+
+    const course = {
+        course_id,
+        subject_id,
+        shift_id,
+        semester_id,
+        teacher_id,
+        day_of_week,
+        room,
+        start_date,
+        course_length_weeks
+    };
+    const record = await courseServ.createOne(course);
+
+    if (!record || record.length === 0) {
+        return next(
+            new AppError(
+                'Some thing went wrong when creating new subject, try again',
+                400
+            )
+        );
+    }
+    res.status(201).json({
+        status: 'success',
+        data: {
+            course: record
         }
     });
 });
