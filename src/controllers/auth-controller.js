@@ -70,7 +70,6 @@ exports.signup = catchAsync(async (req, res, next) => {
         phone,
         addr
     };
-    console.log(userData);
     const userInfo = await userServ.createOne(userData);
 
     createSendToken(
@@ -78,20 +77,10 @@ exports.signup = catchAsync(async (req, res, next) => {
             ...account,
             ...userInfo
         },
-        200,
+        201,
         req,
         res
     );
-
-    res.status(201).json({
-        status: 'success',
-        data: {
-            new_user: {
-                ...account,
-                ...userInfo
-            }
-        }
-    });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
