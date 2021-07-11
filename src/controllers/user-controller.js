@@ -4,94 +4,85 @@ const AppError = require('../utils/appError');
 const pool = require('../database');
 const userServ = require('../services/user-service');
 
-exports.getUsers = catchAsync(async (req, res, next) => {
-    let { limit, offset } = req.query;
-    const filter = {};
-    limit = Number.parseInt(limit);
-    filter.limit = limit && limit >= 0 ? limit : null;
-    filter.offset = offset || 0;
+exports.getAll = acc_type => {
+    return catchAsync(async (req, res, next) => {
+        let { limit, offset } = req.query;
+        const filter = {};
+        limit = Number.parseInt(limit);
+        filter.limit = limit && limit >= 0 ? limit : null;
+        filter.offset = offset || 0;
 
-    const { acc_type } = req.body;
-    if (!acc_type) {
-        return next(
-            new AppError('You must include acc_type to json request', 400)
-        );
-    }
-    const records = await userServ.getAll(filter, acc_type);
+        const records = await userServ.getAll(filter, acc_type);
 
-    if (!records || records.length === 0) {
-        return next(new AppError('No record found', 404));
-    }
-
-    res.status(200).json({
-        status: 'success',
-        data: {
-            count: records.length,
-            users: records
+        if (!records || records.length === 0) {
+            return next(new AppError('No record found', 404));
         }
-    });
-});
 
-exports.getUser = catchAsync(async (req, res, next) => {
-    const { user_id } = req.params;
-    const { acc_type } = req.body;
-    if (!acc_type) {
-        return next(
-            new AppError('You must include acc_type to json request', 400)
-        );
-    }
-    const record = await userServ.getOne({ user_id, acc_type });
-    if (!record || record.length === 0) {
-        return next(new AppError('No record found with that id', 404));
-    }
-    res.status(200).json({
-        status: 'success',
-        data: {
-            user: record
+        res.status(200).json({
+            status: 'success',
+            data: {
+                count: records.length,
+                users: records
+            }
+        });
+    });
+};
+exports.getOne = acc_type => {
+    return catchAsync(async (req, res, next) => {
+        const { user_id } = req.params;
+        const record = await userServ.getOne({ user_id, acc_type: acc_type });
+        if (!record || record.length === 0) {
+            return next(new AppError('No record found with that id', 404));
         }
+        res.status(200).json({
+            status: 'success',
+            data: {
+                user: record
+            }
+        });
     });
-});
+};
+exports.updateOne = acc_type => {
+    return catchAsync(async (req, res, next) => {
+        const { user_id } = req.params;
+        const { fullname, gender, dob, phone, addr } = req.body;
+        const userData = {
+            user_id,
+            acc_type,
+            fullname,
+            gender,
+            dob,
+            phone,
+            addr
+        };
+        const record = await userServ.updateOne(userData);
 
-exports.updateUser = catchAsync(async (req, res, next) => {
-    const { user_id } = req.params;
-    const { acc_type, fullname, gender, dob, phone, addr } = req.body;
-    const userData = {
-        user_id,
-        acc_type,
-        fullname,
-        gender,
-        dob,
-        phone,
-        addr
-    };
-    const record = await userServ.updateOne(userData);
-
-    if (!record || record.length === 0) {
-        return next(new AppError('Failed when updating the record', 400));
-    }
-
-    res.status(201).json({
-        status: 'success',
-        data: {
-            user: record
+        if (!record || record.length === 0) {
+            return next(new AppError('Failed when updating the record', 400));
         }
+
+        res.status(201).json({
+            status: 'success',
+            data: {
+                user: record
+            }
+        });
     });
-});
+};
+exports.deleteOne = acc_type => {
+    return catchAsync(async (req, res, next) => {
+        const { user_id } = req.params;
+        let isDeleted = await userServ.deleteOne(acc_type, user_id)
+        if(!isDeleted){
+            return next(new AppError('', 404));
+        }
 
-exports.deleteUser = catchAsync(async (req, res, next) => {
-    const { user_id } = req.params;
-    const { acc_type } = req.body;
-    let queryString = `DELETE FROM ${acc_type}s s WHERE s.account_id = $1 RETURNING *`;
-    await pool.query(queryString, [user_id]);
-
-    queryString = `DELETE FROM accounts s WHERE s.account_id = $1`;
-    await pool.query(queryString, [user_id]);
-
-    res.status(204).json({
-        status: 'success',
-        data: {}
+        res.status(204).json({
+            status: 'success',
+            data: {}
+        });
     });
-});
+};
 
 exports.createUser = (req, res) => {
     res.status(500).json({
