@@ -4,7 +4,7 @@ exports.getAll = async filter => {
     let sql = `SELECT c.course_id, 
                 su.name as "subject_name", 
                 sh.start_at, sh.end_at,
-                t.fullname as "teacher_name", c.day_of_week, c.room
+                t.fullname as "teacher_name", c.day_of_week, c.room, c.start_date, c.course_length_weeks
                 FROM courses c
                 LEFT JOIN subjects su USING (subject_id)
                 LEFT JOIN shifts sh USING (shift_id)
@@ -19,7 +19,7 @@ exports.getOne = async course_id => {
     const sql = `SELECT c.course_id, 
                   su.name as "subject_name", 
                   sh.start_at, sh.end_at,
-                  t.fullname as "teacher_name", c.day_of_week, c.room
+                  t.fullname as "teacher_name", c.day_of_week, c.room, c.start_date, c.course_length_weeks
                   FROM courses c
                   LEFT JOIN subjects su USING (subject_id)
                   LEFT JOIN shifts sh USING (shift_id)
@@ -35,7 +35,7 @@ exports.createOne = async course => {
         courses (course_id, subject_id, shift_id, semester_id, 
         teacher_id, day_of_week, room, start_date, course_length_weeks) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
-    const records = await pool.query(sql, [
+    await pool.query(sql, [
         course.course_id,
         course.subject_id,
         course.shift_id,
@@ -44,7 +44,8 @@ exports.createOne = async course => {
         course.day_of_week,
         course.room,
         course.start_date,
-        course.course_length_weeks,
+        course.course_length_weeks
     ]);
-    return records.rows[0];
+    const newCourse = await this.getOne(course.course_id);
+    return newCourse;
 };
