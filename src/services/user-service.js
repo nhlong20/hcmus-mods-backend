@@ -27,7 +27,7 @@ exports.getAll = async (filter, acc_type) => {
 };
 
 exports.getOne = async data => {
-    const sql = `SELECT acc.acc_type, acc.username, acc.refresh_token,acc.created_at,s.* 
+    const sql = `SELECT *
                   FROM accounts acc 
                   NATURAL JOIN ${data.acc_type}s s 
                   WHERE acc.account_id = s.account_id AND acc.account_id = $1`;
@@ -36,7 +36,7 @@ exports.getOne = async data => {
 };
 
 exports.getOneByUsername = async data => {
-    const sql = `SELECT acc.acc_type, acc.username, acc.refresh_token,acc.created_at,s.*
+    const sql = `SELECT *
                 FROM accounts acc 
                 NATURAL JOIN ${data.acc_type}s s 
                 WHERE acc.account_id = s.account_id AND acc.username = $1`;
