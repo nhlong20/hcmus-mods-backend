@@ -15,7 +15,8 @@ exports.getAccount = async _id => {
 };
 
 exports.getAll = async (filter, acc_type) => {
-    const sql = `SELECT * FROM accounts acc
+    const sql = `SELECT acc.acc_type, acc.username, acc.refresh_token,acc.created_at, s.* 
+            FROM accounts acc
               NATURAL JOIN ${acc_type}s s
               WHERE acc.account_id = s.account_id 
               ORDER BY acc.username ASC
@@ -26,7 +27,7 @@ exports.getAll = async (filter, acc_type) => {
 };
 
 exports.getOne = async data => {
-    const sql = `SELECT * 
+    const sql = `SELECT acc.acc_type, acc.username, acc.refresh_token,acc.created_at,s.* 
                   FROM accounts acc 
                   NATURAL JOIN ${data.acc_type}s s 
                   WHERE acc.account_id = s.account_id AND acc.account_id = $1`;
@@ -35,7 +36,7 @@ exports.getOne = async data => {
 };
 
 exports.getOneByUsername = async data => {
-    const sql = `SELECT * 
+    const sql = `SELECT acc.acc_type, acc.username, acc.refresh_token,acc.created_at,s.*
                 FROM accounts acc 
                 NATURAL JOIN ${data.acc_type}s s 
                 WHERE acc.account_id = s.account_id AND acc.username = $1`;
@@ -79,7 +80,7 @@ exports.updateOne = async user => {
       addr = $5
   WHERE account_id = $6 RETURNING *`;
 
-    const record = await pool.query(sql, [
+    await pool.query(sql, [
         user.fullname,
         user.gender,
         user.dob,
@@ -87,5 +88,6 @@ exports.updateOne = async user => {
         user.addr,
         user.user_id
     ]);
-    return record.rows[0];
+    updatedOne = this.getOne(user);
+    return updatedOne;
 };
