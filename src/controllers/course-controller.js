@@ -10,7 +10,7 @@ exports.getAll = catchAsync(async (req, res, next) => {
     filter.limit = limit && limit >= 0 ? limit : null;
     filter.offset = offset || 0;
 
-    const courses = await courseServ.getCourses(filter);
+    const courses = await courseServ.getAll(filter);
 
     if (!courses || courses.length === 0) {
         return next(new AppError('No record found', 404));
@@ -40,15 +40,6 @@ exports.getOne = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.createOne = catchAsync(async (req, res, next) => {
-    const course = 'hello';
-    res.status(201).json({
-        status: 'success',
-        data: {
-            course
-        }
-    });
-});
 exports.createOne = catchAsync(async (req, res, next) => {
     const {
         course_id,
