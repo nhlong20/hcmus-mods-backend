@@ -1,7 +1,7 @@
 'use strict';
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
-const subjectServ = require('../services/subject-service');
+const reviewServ = require('../services/review-service');
 
 exports.getAll = catchAsync(async (req, res, next) => {
     let { limit, offset } = req.query;
@@ -10,7 +10,7 @@ exports.getAll = catchAsync(async (req, res, next) => {
     filter.limit = limit && limit >= 0 ? limit : null;
     filter.offset = offset || 0;
 
-    const records = await subjectServ.getAll(filter);
+    const records = await reviewServ.getAll(filter);
     if (!records || records.length === 0) {
         return next(new AppError('No record found', 404));
     }
@@ -18,14 +18,13 @@ exports.getAll = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         data: {
-            subjects: records
+            reviews: records
         }
     });
 });
-
 exports.getOne = catchAsync(async (req, res, next) => {
-    const { subject_id } = req.params;
-    const record = await subjectServ.getOne(subject_id);
+    const { review_id } = req.params;
+    const record = await reviewServ.getOne(review_id);
 
     if (!record || record.length === 0) {
         return next(new AppError('No record found with that id', 404));
@@ -34,16 +33,18 @@ exports.getOne = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         data: {
-            subject: record
+            review: record
         }
     });
 });
 
 exports.createOne = catchAsync(async (req, res, next) => {
-    const { subject_id, prerequisite_subject, name, credits } = req.body;
-    const subject = { subject_id, prerequisite_subject, name, credits };
+    const { course_id } = req.params;
+    const { account_id } = req.user;
+    const { review_body } = req.body;
+    const review = { review_body, course_id, account_id };
 
-    const record = await subjectServ.createOne(subject);
+    const record = await reviewServ.createOne(review);
 
     if (!record || record.length === 0) {
         return next(
@@ -53,20 +54,21 @@ exports.createOne = catchAsync(async (req, res, next) => {
             )
         );
     }
+    const newReview = await reviewServ.getOne(record.review_id);
+
     res.status(201).json({
         status: 'success',
         data: {
-            subject: record
+            review: newReview
         }
     });
 });
 
 exports.updateOne = catchAsync(async (req, res, next) => {
-    const { subject_id } = req.params;
-    const { prerequisite_subject, name, credits } = req.body;
-    const subject = { subject_id, prerequisite_subject, name, credits };
-    const record = await subjectServ.updateOne(subject);
-
+    const { review_id } = req.params;
+    const { review_body } = req.body;
+    const review = { review_id, review_body };
+    const record = await reviewServ.updateOne(review);
     if (!record || record.length === 0) {
         return next(
             new AppError(
@@ -75,10 +77,21 @@ exports.updateOne = catchAsync(async (req, res, next) => {
             )
         );
     }
+    const updatedReview = await reviewServ.getOne(record.review_id);
+
     res.status(201).json({
         status: 'success',
         data: {
-            subject: record
+            review: updatedReview
         }
+    });
+});
+
+exports.deleteOne = catchAsync(async (req, res, next) => {
+    const { review_id } = req.params;
+    await reviewServ.deleteOne(review_id);
+    res.status(204).json({
+        status: 'success',
+        data: {}
     });
 });
