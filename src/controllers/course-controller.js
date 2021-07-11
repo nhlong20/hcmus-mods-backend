@@ -10,6 +10,8 @@ exports.getAll = catchAsync(async (req, res, next) => {
     filter.limit = limit && limit >= 0 ? limit : null;
     filter.offset = offset || 0;
 
+    const courses = await courseServ.getCourses(filter);
+
     if (!courses || courses.length === 0) {
         return next(new AppError('No record found', 404));
     }

@@ -58,7 +58,6 @@ exports.createOne = async user => {
                   (${user.acc_type}_id, account_id, fullname, gender, dob, phone, addr) 
                   VALUES ($1,$2,$3,$4,$5,$6,$7) 
                   RETURNING *`;
-    console.log(sql);
     const record = await pool.query(sql, [
         user.username,
         user.account_id,

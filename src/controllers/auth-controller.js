@@ -70,7 +70,6 @@ exports.signup = catchAsync(async (req, res, next) => {
         phone,
         addr
     };
-    console.log(userData);
     const userInfo = await userServ.createOne(userData);
 
     createSendToken(
@@ -78,20 +77,10 @@ exports.signup = catchAsync(async (req, res, next) => {
             ...account,
             ...userInfo
         },
-        200,
+        201,
         req,
         res
     );
-
-    res.status(201).json({
-        status: 'success',
-        data: {
-            new_user: {
-                ...account,
-                ...userInfo
-            }
-        }
-    });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -158,6 +147,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
     // 2 - Verification token
     const decoded = await jwthelper.verifyToken(token, accessTokenSecret);
+
     // 3 - Check if user still exists
     const user = await userServ.getAccount(decoded.user.account_id);
     if (!user) {
