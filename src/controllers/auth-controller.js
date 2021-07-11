@@ -147,6 +147,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
     // 2 - Verification token
     const decoded = await jwthelper.verifyToken(token, accessTokenSecret);
+
     // 3 - Check if user still exists
     const user = await userServ.getAccount(decoded.user.account_id);
     if (!user) {
