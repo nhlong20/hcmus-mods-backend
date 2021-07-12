@@ -4,7 +4,6 @@ const authCtrl = require('../controllers/auth-controller');
 
 const router = express.Router();
 
-router.post('/signup', authCtrl.signup);
 router.post('/login', authCtrl.login);
 router.get('/logout', authCtrl.logout);
 
@@ -13,6 +12,7 @@ router.get('/logout', authCtrl.logout);
 
 // Protect all routes after this middleware
 router.use(authCtrl.protect);
+router.post('/signup', authCtrl.restrictTo('admin'), authCtrl.signup);
 
 router
     .route('/students/:user_id')
