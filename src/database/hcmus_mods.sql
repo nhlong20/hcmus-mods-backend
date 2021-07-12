@@ -23,7 +23,7 @@ CREATE TABLE Accounts (
   account_id          SERIAL NOT NULL,
   acc_type            varchar(10) NOT NULL,
   username            varchar(30) UNIQUE NOT NULL,
-  passwd              varchar(100) NOT NULL,
+  passwd              text NOT NULL,
   refresh_token       text,
   created_at          timestamp without time zone default CURRENT_TIMESTAMP NOT NULL
   );
@@ -236,10 +236,12 @@ ALTER TABLE Appendix ADD CONSTRAINT fk_appendix__module_id FOREIGN KEY (module_i
 ALTER TABLE Reviews ADD CONSTRAINT fk_review__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
 
 
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120449', '18120449', default);
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120460', '18120460', default);
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120461', '18120461', default);
-INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'teacher', 'gv001', 'gv001', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120444', '$2a$10$/rMxJ60N/AftmeQTJHqT1.qVjfsjgNi1jV1QGctkVz/d1Wk3XpWLe', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120445', '$2a$10$djzDN4TqOW25clNtTE2BG.7PnqKamPO0vr/Zn3B5syiTY.B7mydVa', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120443', '$2a$10$jumYnaiTd6q4xUQ7fFPgiOAXhc5dlnGRg3EKv4hQhRrNN7ZwynPVO', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'teacher', 'gv001', '$2a$10$Psp2P6FwDqht9m1gJlnWt.aaSwJgRfzA7LQLiNIovzAyURI8Df74C', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'teacher', 'gv002', '$2a$10$brvh19ch.GopuzJmly0WtemermPkynZmmv/Pdz.vEWv8AjhbfwLKe', default);
+INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'admin', 'admin', '$2a$10$alAGf2H.UoDUpidIBD7ej.PeaGtJ0aFDv8ln3cTiGifelojgTFYLy', default);
 
 INSERT INTO Subjects (subject_id, name, credits) VALUES ('OOP', 'Lập trình hướng đối tượng', 4);
 INSERT INTO Subjects (subject_id, name, credits) VALUES ('CTDLGT', 'Cấu trúc dữ liệu và giải thuật', 4);
@@ -265,18 +267,20 @@ INSERT INTO Shifts(shift_id, start_at, end_at) VALUES (2, '09:30:00', '11:30:00'
 INSERT INTO Shifts(shift_id, start_at, end_at) VALUES (3, '13:30:00', '15:30:00');
 INSERT INTO Shifts(shift_id, start_at, end_at) VALUES (4, '15:30:00', '17:30:00');
 
-INSERT INTO Teachers (teacher_id, fullname, gender, dob, account_id) VALUES ('gv001', 'Hồ Tuấn Thanh', 'Nam','1998-04-01', 4);
+INSERT INTO Admins (admin_id, fullname, gender, dob, account_id) VALUES ('admin', 'Trần Văn Quý', 'Nam','1998-04-01', 6);
+INSERT INTO Teachers (teacher_id, fullname, gender, dob, account_id) VALUES ('gv001', 'Trần Văn Quý', 'Nam','1998-04-01', 4);
+INSERT INTO Teachers (teacher_id, fullname, gender, dob, account_id) VALUES ('gv002', 'Hồ Tuấn Thanh', 'Nam','1998-04-01', 5);
 
-INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120449', 'Nguyễn Hoàng Long', 'Nam', '2000-04-01', 'Nghệ An',  1);
-INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120460', 'Lê Danh Lưu', 'Nam', '2000-09-06', 'Đắk Lắk', 2);
-INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120461', 'Trần Nhật Quang', 'Nam', '2000-05-21', 'Bình Thuận', 3);
+INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120444', 'Nguyễn Hoàng Sơn', 'Nam', '2000-04-01', 'Bình Phước',  1);
+INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120445', 'Lê Danh Lưu', 'Nam', '2000-09-06', 'Đắk Lắk', 2);
+INSERT INTO Students (student_id, fullname, gender, dob, addr, account_id) VALUES ('18120443', 'Trần Nhật Quang', 'Nam', '2000-05-21', 'Bình Thuận', 3);
 
 INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2011', 'OOP', 'gv001', 'Thứ 4', 3, 1, 'F102', '2021-09-06', 12);
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2021', 'CSDL', 'gv001', 'Thứ 5', 1, 2,'F106', '2021-09-06', 12);
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2021', 'CSDL', 'gv002', 'Thứ 5', 1, 2,'F106', '2021-09-06', 12);
 INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2012', 'OOP', 'gv001', 'Thứ 4', 3, 2, 'F103', '2021-09-06', 12);
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2031', 'HDH', 'gv001', 'Thứ 2', 3, 1, 'E104', '2021-09-06', 12);
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2031', 'HDH', 'gv002', 'Thứ 2', 3, 1, 'E104', '2021-09-06', 12);
 INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2041', 'MMT', 'gv001', 'Thứ 7', 1, 2, 'F202', '2021-09-06', 12);
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2051', 'CTDLGT', 'gv001', 'Thứ 3', 4, 2, 'E305', '2021-09-06', 12);
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2051', 'CTDLGT', 'gv002', 'Thứ 3', 4, 2, 'E305', '2021-09-06', 12);
 INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('SE2111', 'DAAS', 'gv001', 'Thứ 4', 2, 2, 'E204', '2021-09-06', 12);
-INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2121', 'NMHM', 'gv001', 'Thứ 6', 3, 2, 'G102', '2021-09-06', 12);
+INSERT INTO Courses (course_id, subject_id, teacher_id, day_of_week, shift_id, semester_id, room, start_date, course_length_weeks) VALUES ('CS2121', 'NMHM', 'gv002', 'Thứ 6', 3, 2, 'G102', '2021-09-06', 12);
 

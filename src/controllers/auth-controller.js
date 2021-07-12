@@ -43,13 +43,13 @@ const createSendToken = (user, statusCode, req, res) => {
     });
 };
 
-exports.signup = catchAsync(async (req, res, next) => {
+exports.createUser = catchAsync(async (req, res, next) => {
     // hash password
     const { username, password, acc_type, fullname, gender, dob, phone, addr } =
         req.body;
 
     if (!username || !password || !acc_type) {
-        return next(new AppError('Please provide user and password!', 400));
+        return next(new AppError('Please provide username and password!', 400));
     }
 
     // Check exíting account
@@ -86,16 +86,15 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
     const { acc_type, username, password } = req.body;
     if (!username || !password) {
-        return next(new AppError('Please provide user and password!', 400));
+        return next(new AppError('Please provide username and password!', 400));
     }
-
     const record = await userServ.getOneByUsername({ acc_type, username });
     if (
         !record ||
         record.length === 0 ||
         !(await userServ.validPassword(password, record.passwd))
     ) {
-        return next(new AppError('Incorrect email or password', 401));
+        return next(new AppError('Incorrect username or password', 401));
     }
 
     let user = { ...record };

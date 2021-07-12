@@ -72,6 +72,7 @@ exports.updateOne = acc_type => {
 exports.deleteOne = acc_type => {
     return catchAsync(async (req, res, next) => {
         const { user_id } = req.params;
+        console.log(user_id)
         let isDeleted = await userServ.deleteOne(acc_type, user_id)
         if(!isDeleted){
             return next(new AppError('', 404));
