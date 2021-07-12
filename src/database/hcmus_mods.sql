@@ -82,10 +82,10 @@ CREATE TABLE Courses (
   subject_id            varchar(10) NOT NULL, 
   shift_id              integer NOT NULL, 
   semester_id           integer NOT NULL, 
-  teacher_id            varchar(20) NOT NULL,
-  day_of_week           varchar(10) NOT NULL CHECK (day_of_week in ('Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ Nhật')),
+  teacher_id            varchar(20),
+  day_of_week           varchar(10) CHECK (day_of_week in ('Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ Nhật')),
   room                  varchar(10),
-  start_date            date NOT NULL CHECK (start_date > '1900-01-01'),
+  start_date            date CHECK (start_date > '1900-01-01'),
   course_length_weeks   integer
   );
 
@@ -218,22 +218,22 @@ ALTER TABLE Student_Course ADD CONSTRAINT FK_course_student__course_id FOREIGN K
 ALTER TABLE RegistrationSessions ADD CONSTRAINT FK_courseregistrationsession__semester_id FOREIGN KEY (semester_id) REFERENCES Semesters (semester_id);
 ALTER TABLE Courses ADD CONSTRAINT FK_course__shift_id FOREIGN KEY (shift_id) REFERENCES Shifts (shift_id);
 ALTER TABLE Student_Course ADD CONSTRAINT FKStudent_Co197422 FOREIGN KEY (student_id) REFERENCES Students (student_id);
-ALTER TABLE Teachers ADD CONSTRAINT FK_teacher__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
-ALTER TABLE Moderators ADD CONSTRAINT FK_moderator__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
-ALTER TABLE Admins ADD CONSTRAINT FKAdmin915765 FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
+ALTER TABLE Teachers ADD CONSTRAINT FK_teacher__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id) ON DELETE CASCADE;
+ALTER TABLE Moderators ADD CONSTRAINT FK_moderator__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id) ON DELETE CASCADE;
+ALTER TABLE Admins ADD CONSTRAINT FKAdmin915765 FOREIGN KEY (account_id) REFERENCES Accounts (account_id) ON DELETE CASCADE;
 ALTER TABLE Courses ADD CONSTRAINT FK_course__semester_id FOREIGN KEY (semester_id) REFERENCES Semesters (semester_id);
-ALTER TABLE Courses ADD CONSTRAINT FK_course__teacher_id FOREIGN KEY (teacher_id) REFERENCES Teachers (teacher_id);
+ALTER TABLE Courses ADD CONSTRAINT FK_course__teacher_id FOREIGN KEY (teacher_id) REFERENCES Teachers (teacher_id) ON DELETE SET NULL;
 ALTER TABLE Modules ADD CONSTRAINT fk_module__course_id FOREIGN KEY (course_id) REFERENCES Courses (course_id);
 ALTER TABLE Courseworks ADD CONSTRAINT fk_coursework__module_id FOREIGN KEY (module_id) REFERENCES Modules (module_id);
 ALTER TABLE Lectures ADD CONSTRAINT fk_lecture__module_id FOREIGN KEY (module_id) REFERENCES Modules (module_id);
 ALTER TABLE Subjects ADD CONSTRAINT fk_subject__subject_id FOREIGN KEY (prerequisite_subject) REFERENCES Subjects (subject_id);
 ALTER TABLE Reviews ADD CONSTRAINT fk_review__course_id FOREIGN KEY (course_id) REFERENCES Courses (course_id);
 ALTER TABLE Topics ADD CONSTRAINT fk_topic__course_id FOREIGN KEY (course_id) REFERENCES Courses (course_id);
-ALTER TABLE Students ADD CONSTRAINT fk_student__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
-ALTER TABLE Comments ADD CONSTRAINT fk_comment__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
+ALTER TABLE Students ADD CONSTRAINT fk_student__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id) ON DELETE CASCADE;
+ALTER TABLE Comments ADD CONSTRAINT fk_comment__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id) ON DELETE CASCADE;
 ALTER TABLE Comments ADD CONSTRAINT fk_comment__topic_id FOREIGN KEY (topic_id) REFERENCES Topics (topic_id);
 ALTER TABLE Appendix ADD CONSTRAINT fk_appendix__module_id FOREIGN KEY (module_id) REFERENCES Modules (module_id);
-ALTER TABLE Reviews ADD CONSTRAINT fk_review__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id);
+ALTER TABLE Reviews ADD CONSTRAINT fk_review__account_id FOREIGN KEY (account_id) REFERENCES Accounts (account_id) ON DELETE CASCADE;
 
 
 INSERT INTO Accounts (account_id, acc_type, username, passwd, created_at) VALUES (default, 'student', '18120444', '$2a$10$/rMxJ60N/AftmeQTJHqT1.qVjfsjgNi1jV1QGctkVz/d1Wk3XpWLe', default);

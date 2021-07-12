@@ -91,12 +91,8 @@ exports.updateOne = async user => {
     updatedOne = this.getOne(user);
     return updatedOne;
 };
-exports.deleteOne = async (acc_type, user_id) => {
-    let sql = `DELETE FROM ${acc_type}s s WHERE s.account_id = $1 RETURNING *`;
-    await pool.query(sql, [user_id]);
-
-    sql = `DELETE FROM accounts s WHERE s.account_id = $1`;
-    await pool.query(sql, [user_id]);
-
-    return true;
+exports.deleteOne = async user_id => {
+    sql = `DELETE FROM accounts s WHERE s.account_id = $1 RETURNING *`;
+    const deleted = await pool.query(sql, [user_id]);
+    return deleted.rows.length;
 };

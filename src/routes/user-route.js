@@ -16,28 +16,28 @@ router
     .route('/students/:user_id')
     .get(userCtrl.getOne('student'))
     .patch(userCtrl.updateOne('student'))
-    .delete(userCtrl.deleteOne('student'));
+    .delete(userCtrl.deleteOne);
 
 router.use(authCtrl.restrictTo('admin', 'moderator', 'teacher'));
 router
     .route('/teachers/:user_id')
     .get(userCtrl.getOne('teacher'))
     .patch(userCtrl.updateOne('teacher'))
-    .delete(userCtrl.deleteOne('teacher'));
+    .delete(userCtrl.deleteOne);
 
 router.use(authCtrl.restrictTo('admin', 'moderator'));
 router
     .route('/moderators/:user_id')
     .get(userCtrl.getOne('moderator'))
     .patch(userCtrl.updateOne('moderator'))
-    .delete(userCtrl.deleteOne('moderator'));
+    .delete(userCtrl.deleteOne);
 
 router.use(authCtrl.restrictTo('admin'));
 router
     .route('/admin/:user_id')
     .get(userCtrl.getOne('admin'))
     .patch(userCtrl.updateOne('admin'))
-    .delete(userCtrl.deleteOne('admin'));
+    .delete(userCtrl.deleteOne);
 
 router.route('/moderators').get(userCtrl.getAll('moderator'));
 router.route('/students').get(userCtrl.getAll('student'));
