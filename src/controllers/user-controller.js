@@ -69,20 +69,18 @@ exports.updateOne = acc_type => {
         });
     });
 };
-exports.deleteOne = acc_type => {
-    return catchAsync(async (req, res, next) => {
-        const { user_id } = req.params;
-        let isDeleted = await userServ.deleteOne(acc_type, user_id)
-        if(!isDeleted){
-            return next(new AppError('', 404));
-        }
+exports.deleteOne = catchAsync(async (req, res, next) => {
+    const { user_id } = req.params;
+    let isDeleted = await userServ.deleteOne(user_id);
+    if (!isDeleted) {
+        return next(new AppError('', 404));
+    }
 
-        res.status(204).json({
-            status: 'success',
-            data: {}
-        });
+    res.status(204).json({
+        status: 'success',
+        data: {}
     });
-};
+});
 
 exports.createUser = (req, res) => {
     res.status(500).json({
