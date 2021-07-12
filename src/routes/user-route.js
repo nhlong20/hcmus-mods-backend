@@ -12,6 +12,12 @@ router.get('/logout', authCtrl.logout);
 
 // Protect all routes after this middleware
 router.use(authCtrl.protect);
+
+router.route('/moderators').get(userCtrl.getAll('moderator'));
+router.route('/students').get(userCtrl.getAll('student'));
+router.route('/teachers').get(userCtrl.getAll('teacher'));
+router.route('/admin').get(userCtrl.getAll('admin'));
+
 router
     .route('/students/:user_id')
     .get(userCtrl.getOne('student'))
@@ -39,10 +45,6 @@ router
     .patch(userCtrl.updateOne('admin'))
     .delete(userCtrl.deleteOne);
 
-router.route('/moderators').get(userCtrl.getAll('moderator'));
-router.route('/students').get(userCtrl.getAll('student'));
-router.route('/teachers').get(userCtrl.getAll('teacher'));
-router.route('/admin').get(userCtrl.getAll('admin'));
 router.route('/signup').post(authCtrl.createUser);
 
 module.exports = router;
